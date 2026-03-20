@@ -22,6 +22,36 @@ namespace NetLauncher
             playButton.Click += PlayButton_Click;
         }
 
+        private void McVersion_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) return;
+
+            string versionId = mcVersion.Items[e.Index].ToString();
+
+            // Verificar si la versión está cacheada localmente
+            string versionJson = Path.Combine(VersionDetail.MinecraftPath, "versions", versionId, $"{versionId}.json");
+            bool isCached = File.Exists(versionJson);
+
+            // Fondo — azul si está seleccionado, blanco si no
+            e.DrawBackground();
+
+            // Fuente — negrita si está cacheada, normal si no
+            Font font = isCached
+                ? new Font(e.Font, FontStyle.Bold)
+                : e.Font;
+
+            // Color del texto
+            Brush brush = (e.State & DrawItemState.Selected) != 0
+                ? SystemBrushes.HighlightText
+                : SystemBrushes.WindowText;
+
+            e.Graphics.DrawString(versionId, font, brush, e.Bounds);
+
+            if (isCached) font.Dispose();
+
+            e.DrawFocusRectangle();
+        }
+
         private async void Main_Load(object sender, EventArgs e)
         {
             playButton.Enabled = false;

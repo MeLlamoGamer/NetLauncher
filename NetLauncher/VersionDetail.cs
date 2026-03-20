@@ -46,7 +46,21 @@ namespace NetLauncher
             Id = versionId;
             _versionUrl = versionUrl; // guardar para ExtractNativesAsync
 
-            string json = await _http.GetStringAsync(versionUrl);
+            string versionCachePath = Path.Combine(MinecraftPath, "versions", versionId, $"{versionId}.json");
+            string json;
+
+            if (File.Exists(versionCachePath))
+            {
+                // Ya está cacheado — usar local
+                json = File.ReadAllText(versionCachePath);
+            }
+            else
+            {
+                // Descargar y cachear
+                json = await _http.GetStringAsync(versionUrl);
+                Directory.CreateDirectory(Path.GetDirectoryName(versionCachePath));
+                File.WriteAllText(versionCachePath, json);
+            }
 
             using (JsonDocument doc = JsonDocument.Parse(json))
             {
@@ -171,7 +185,10 @@ namespace NetLauncher
             string nativesPath = Path.Combine(MinecraftPath, "versions", Id, "natives");
             Directory.CreateDirectory(nativesPath);
 
-            string json = await _http.GetStringAsync(_versionUrl);
+            string versionCachePath = Path.Combine(MinecraftPath, "versions", Id, $"{Id}.json");
+            string json = File.Exists(versionCachePath)
+                ? File.ReadAllText(versionCachePath)
+                : await _http.GetStringAsync(_versionUrl);
 
             using (JsonDocument doc = JsonDocument.Parse(json))
             {

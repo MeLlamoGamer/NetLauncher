@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Windows.Forms;
 
 namespace NetLauncher
 {
@@ -49,6 +50,9 @@ namespace NetLauncher
             this.mcVersion.Name = "mcVersion";
             this.mcVersion.Size = new System.Drawing.Size(107, 27);
             this.mcVersion.TabIndex = 0;
+            mcVersion.DrawMode = DrawMode.OwnerDrawFixed;
+            mcVersion.DrawItem += McVersion_DrawItem;
+            mcVersion.DropDownStyle = ComboBoxStyle.DropDownList;
             // 
             // playButton
             // 
