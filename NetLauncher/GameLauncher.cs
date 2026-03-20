@@ -28,16 +28,18 @@ namespace NetLauncher
             else
             {
                 gameArgs = detail.MinecraftArguments
-                    .Replace("${auth_player_name}", session.Username)
-                    .Replace("${auth_uuid}", session.UUID)
-                    .Replace("${auth_access_token}", session.AccessToken)
-                    .Replace("${auth_session}", session.AccessToken)
-                    .Replace("${game_directory}", $"\"{mcPath}\"")
-                    .Replace("${assets_root}", $"\"{assetsPath}\"")
-                    .Replace("${assets_index_name}", assetIndex)
-                    .Replace("${version_name}", detail.Id)
-                    .Replace("${user_type}", "offline")
-                    .Replace("${user_properties}", "{}");
+                .Replace("${auth_player_name}", session.Username)
+                .Replace("${auth_username}", session.Username)   // ← formato muy viejo
+                .Replace("${auth_uuid}", session.UUID)
+                .Replace("${auth_access_token}", session.AccessToken)
+                .Replace("${auth_session}", session.AccessToken)
+                .Replace("${game_directory}", $"\"{mcPath}\"")
+                .Replace("${assets_root}", $"\"{assetsPath}\"")
+                .Replace("${game_assets}", $"\"{assetsPath}\"") // ← formato muy viejo
+                .Replace("${assets_index_name}", assetIndex)
+                .Replace("${version_name}", detail.Id)
+                .Replace("${user_type}", "offline")
+                .Replace("${user_properties}", "{}");
 
                 jvmArgs = $"-Xmx2G -Djava.library.path=\"{nativesPath}\" -cp \"{classpath}\"";
             }
@@ -72,7 +74,6 @@ namespace NetLauncher
 
         private string FindJava(int requiredMajor)
         {
-            // 1. Buscar en las rutas estándar de instalación de Java
             string[] searchRoots = new[]
             {
                 @"C:\Program Files\Java",
@@ -82,6 +83,9 @@ namespace NetLauncher
                 @"C:\Program Files\BellSoft",
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Programs\Eclipse Adoptium",
             };
+
+            string bestExe = null;
+            int bestVersion = int.MaxValue;
 
             foreach (string root in searchRoots)
             {
@@ -93,13 +97,17 @@ namespace NetLauncher
                     if (!File.Exists(javaBin)) continue;
 
                     int version = GetJavaVersion(javaBin);
-                    if (version >= requiredMajor)
-                        return javaBin;
+
+                    // Tiene que ser >= al requerido, y preferimos el más cercano
+                    if (version >= requiredMajor && version < bestVersion)
+                    {
+                        bestVersion = version;
+                        bestExe = javaBin;
+                    }
                 }
             }
 
-            // 2. Si no encuentra nada específico, usar el java del PATH y rezar
-            return "java";
+            return bestExe ?? "java";
         }
 
         private int GetJavaVersion(string javaExe)
