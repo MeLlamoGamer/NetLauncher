@@ -1,1 +1,6 @@
-Temporary changelog.
+V1.1:
+- UI changes.
+- Version launching fixes.
+- Now already downloaded versions get cached so it's possible to play without internet.
+Known bugs:
+- Versions from 1.6.1 to 1.7.2 have no sound. At this time is not worth fixing this issue.
