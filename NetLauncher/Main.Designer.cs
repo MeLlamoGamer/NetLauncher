@@ -1,4 +1,6 @@
-﻿namespace NetLauncher
+﻿using System.Drawing;
+
+namespace NetLauncher
 {
     partial class Main
     {
@@ -28,57 +30,73 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.mcVersion = new System.Windows.Forms.ComboBox();
             this.playButton = new System.Windows.Forms.Button();
-            this.title = new System.Windows.Forms.Label();
             this.playerName = new System.Windows.Forms.TextBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // mcVersion
             // 
+            this.mcVersion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.mcVersion.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.mcVersion.FormattingEnabled = true;
-            this.mcVersion.Location = new System.Drawing.Point(12, 332);
+            this.mcVersion.Location = new System.Drawing.Point(12, 327);
+            this.mcVersion.MinimumSize = new System.Drawing.Size(74, 0);
             this.mcVersion.Name = "mcVersion";
-            this.mcVersion.Size = new System.Drawing.Size(74, 21);
+            this.mcVersion.Size = new System.Drawing.Size(107, 27);
             this.mcVersion.TabIndex = 0;
             // 
             // playButton
             // 
+            this.playButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.playButton.Font = new System.Drawing.Font("Segoe Print", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playButton.Location = new System.Drawing.Point(101, 305);
+            this.playButton.Location = new System.Drawing.Point(125, 304);
             this.playButton.Name = "playButton";
-            this.playButton.Size = new System.Drawing.Size(151, 62);
+            this.playButton.Size = new System.Drawing.Size(122, 62);
             this.playButton.TabIndex = 1;
             this.playButton.Text = "Play";
             this.playButton.UseVisualStyleBackColor = true;
             // 
-            // title
-            // 
-            this.title.AutoSize = true;
-            this.title.Font = new System.Drawing.Font("Segoe Print", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.title.Location = new System.Drawing.Point(71, 9);
-            this.title.Name = "title";
-            this.title.Size = new System.Drawing.Size(215, 47);
-            this.title.TabIndex = 2;
-            this.title.Text = "NET Launcher";
-            // 
             // playerName
             // 
-            this.playerName.Location = new System.Drawing.Point(267, 333);
+            this.playerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.playerName.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.playerName.Location = new System.Drawing.Point(253, 327);
             this.playerName.Name = "playerName";
-            this.playerName.Size = new System.Drawing.Size(84, 20);
+            this.playerName.Size = new System.Drawing.Size(115, 27);
             this.playerName.TabIndex = 3;
             this.playerName.Text = "Player";
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
+            this.pictureBox1.Location = new System.Drawing.Point(23, 24);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(327, 79);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 4;
+            this.pictureBox1.TabStop = false;
+            // 
             // Main
             // 
-            this.ClientSize = new System.Drawing.Size(363, 378);
+            this.BackgroundImage = global::NetLauncher.Properties.Resources.bg;
+            this.ClientSize = new System.Drawing.Size(380, 378);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.playerName);
-            this.Controls.Add(this.title);
             this.Controls.Add(this.playButton);
             this.Controls.Add(this.mcVersion);
+            this.MinimumSize = new System.Drawing.Size(380, 378);
             this.Name = "Main";
             this.Text = "Net Launcher";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -88,8 +106,8 @@
 
         private System.Windows.Forms.ComboBox mcVersion;
         private System.Windows.Forms.Button playButton;
-        private System.Windows.Forms.Label title;
         private System.Windows.Forms.TextBox playerName;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
