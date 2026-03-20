@@ -14,18 +14,19 @@ namespace NetLauncher
             string nativesPath = Path.Combine(mcPath, "versions", detail.Id, "natives");
             Directory.CreateDirectory(nativesPath);
 
+            // Buscar el ejecutable de Java correcto
+            string javaExe = FindJava(detail.JavaMajorVersion);
+
             string jvmArgs;
             string gameArgs;
 
             if (detail.IsNewFormat)
             {
-                // ── Formato nuevo 1.13+ ──────────────────────────────────────
                 gameArgs = BuildNewGameArgs(detail.GameArguments, session, mcPath, assetsPath, assetIndex, detail.Id);
                 jvmArgs = BuildNewJvmArgs(detail.JvmArguments, nativesPath, classpath, mcPath, detail.Id);
             }
             else
             {
-                // ── Formato viejo 1.12- ──────────────────────────────────────
                 gameArgs = detail.MinecraftArguments
                     .Replace("${auth_player_name}", session.Username)
                     .Replace("${auth_uuid}", session.UUID)
@@ -44,13 +45,13 @@ namespace NetLauncher
             string fullArgs = $"{jvmArgs} {detail.MainClass} {gameArgs}";
 
             string logPath = Path.Combine(mcPath, "launcher_debug.log");
-            File.WriteAllText(logPath, $"java {fullArgs}");
+            File.WriteAllText(logPath, $"{javaExe} {fullArgs}");
 
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "java",
+                    FileName = javaExe,
                     Arguments = fullArgs,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -67,6 +68,80 @@ namespace NetLauncher
             process.BeginErrorReadLine();
 
             return process;
+        }
+
+        private string FindJava(int requiredMajor)
+        {
+            // 1. Buscar en las rutas estándar de instalación de Java
+            string[] searchRoots = new[]
+            {
+                @"C:\Program Files\Java",
+                @"C:\Program Files\Eclipse Adoptium",
+                @"C:\Program Files\Microsoft",
+                @"C:\Program Files\Amazon Corretto",
+                @"C:\Program Files\BellSoft",
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Programs\Eclipse Adoptium",
+            };
+
+            foreach (string root in searchRoots)
+            {
+                if (!Directory.Exists(root)) continue;
+
+                foreach (string javaDir in Directory.GetDirectories(root))
+                {
+                    string javaBin = Path.Combine(javaDir, "bin", "java.exe");
+                    if (!File.Exists(javaBin)) continue;
+
+                    int version = GetJavaVersion(javaBin);
+                    if (version >= requiredMajor)
+                        return javaBin;
+                }
+            }
+
+            // 2. Si no encuentra nada específico, usar el java del PATH y rezar
+            return "java";
+        }
+
+        private int GetJavaVersion(string javaExe)
+        {
+            try
+            {
+                var p = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = javaExe,
+                        Arguments = "-XshowSettings:property -version",
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+                p.Start();
+                string output = p.StandardError.ReadToEnd();
+                p.WaitForExit();
+
+                // Buscar "java.version = 21.0.x" o similar
+                foreach (string line in output.Split('\n'))
+                {
+                    if (line.Contains("java.version"))
+                    {
+                        string val = line.Split('=')[1].Trim(); // "21.0.3"
+                        string major = val.Split('.')[0];        // "21"
+
+                        // Java 8 se reporta como "1.8.x"
+                        if (major == "1")
+                            major = val.Split('.')[1];
+
+                        if (int.TryParse(major, out int v))
+                            return v;
+                    }
+                }
+            }
+            catch { }
+
+            return 0;
         }
 
         private string BuildNewGameArgs(List<string> args, OfflineSession session, string mcPath, string assetsPath, string assetIndex, string versionId)
@@ -98,7 +173,6 @@ namespace NetLauncher
 
         private string BuildNewJvmArgs(List<string> args, string nativesPath, string classpath, string mcPath, string versionId)
         {
-            // Si Mojang no proveyó JVM args, usamos los mínimos necesarios
             if (args == null || args.Count == 0)
                 return $"-Xmx2G -Djava.library.path=\"{nativesPath}\" -cp \"{classpath}\"";
 
@@ -115,7 +189,6 @@ namespace NetLauncher
                 result.Add(resolved);
             }
 
-            // Agregar memoria si Mojang no la incluyó
             string joined = string.Join(" ", result);
             if (!joined.Contains("-Xmx"))
                 joined = "-Xmx2G " + joined;

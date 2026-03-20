@@ -35,6 +35,7 @@ namespace NetLauncher
             this.playButton = new System.Windows.Forms.Button();
             this.playerName = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.changelog = new System.Windows.Forms.WebBrowser();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -85,10 +86,22 @@ namespace NetLauncher
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
             // 
+            // changelog
+            // 
+            this.changelog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.changelog.Location = new System.Drawing.Point(23, 116);
+            this.changelog.MinimumSize = new System.Drawing.Size(20, 20);
+            this.changelog.Name = "changelog";
+            this.changelog.Size = new System.Drawing.Size(327, 168);
+            this.changelog.TabIndex = 5;
+            // 
             // Main
             // 
             this.BackgroundImage = global::NetLauncher.Properties.Resources.bg;
             this.ClientSize = new System.Drawing.Size(380, 378);
+            this.Controls.Add(this.changelog);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.playerName);
             this.Controls.Add(this.playButton);
@@ -108,6 +121,7 @@ namespace NetLauncher
         private System.Windows.Forms.Button playButton;
         private System.Windows.Forms.TextBox playerName;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.WebBrowser changelog;
     }
 }
 

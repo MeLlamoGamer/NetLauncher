@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.LinkLabel;
@@ -110,6 +111,16 @@ namespace NetLauncher
                 playButton.Text = "¡Jugando!";
 
                 await Task.Run(() => gameProcess.WaitForExit());
+
+                int exitCode = gameProcess.ExitCode;
+                if (exitCode != 0)
+                {
+                    string logPath = Path.Combine(VersionDetail.MinecraftPath, "launcher_debug.log");
+                    string logContent = File.Exists(logPath) ? File.ReadAllText(logPath) : "Sin log disponible";
+
+                    MessageBox.Show($"El juego cerró con error (código {exitCode}).\n\nLog:\n{logContent}",
+                                    "Error al lanzar", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
 
                 // El juego se cerró — resetear botón
                 playButton.Text = "Play";

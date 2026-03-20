@@ -31,6 +31,7 @@ namespace NetLauncher
         public List<string> GameArguments { get; private set; } = new List<string>(); // formato nuevo 1.13+
         public List<string> JvmArguments { get; private set; } = new List<string>(); // formato nuevo 1.13+
         public bool IsNewFormat { get; private set; } = false;
+        public int JavaMajorVersion { get; private set; } = 8; // default para versiones viejas
         public List<LibraryInfo> Libraries { get; private set; } = new List<LibraryInfo>();
 
         public static string MinecraftPath => Path.Combine(
@@ -50,6 +51,13 @@ namespace NetLauncher
                 JsonElement root = doc.RootElement;
 
                 MainClass = root.GetProperty("mainClass").GetString();
+
+                // Detectar versión de Java requerida
+                if (root.TryGetProperty("javaVersion", out JsonElement javaVersionEl))
+                {
+                    if (javaVersionEl.TryGetProperty("majorVersion", out JsonElement majorEl))
+                        JavaMajorVersion = majorEl.GetInt32();
+                }
 
                 // Detectar formato de argumentos
                 if (root.TryGetProperty("minecraftArguments", out JsonElement oldArgs))
