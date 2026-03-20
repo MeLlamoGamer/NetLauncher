@@ -96,6 +96,8 @@ namespace NetLauncher
             this.changelog.Name = "changelog";
             this.changelog.Size = new System.Drawing.Size(327, 168);
             this.changelog.TabIndex = 5;
+            this.changelog.Url = new System.Uri("https://raw.githubusercontent.com/MeLlamoGamer/NetLauncher/refs/heads/master/chan" +
+        "gelog.txt", System.UriKind.Absolute);
             // 
             // Main
             // 
