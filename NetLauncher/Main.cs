@@ -80,7 +80,7 @@ namespace NetLauncher
             playButton.Enabled = false;
             playButton.Text = "Descargando...";
 
-            var progress = new Progress<string>(msg => playButton.Text = msg);
+            IProgress<string> progress = new Progress<string>(msg => playButton.Text = msg);
 
             try
             {
@@ -94,13 +94,44 @@ namespace NetLauncher
 
                 await detail.ExtractNativesAsync(progress);
 
-                // 3. Descargar assets
-                await _assetManager.DownloadAssetsAsync(
-                    detail.AssetIndexUrl,
-                    detail.AssetIndex,
-                    detail.AssetIndexSha1,
-                    progress
+                File.AppendAllText(
+                    Path.Combine(VersionDetail.MinecraftPath, "launcher_debug.log"),
+                    $"\n[DEBUG] AssetIndex: {detail.AssetIndex} | IsLegacy: {detail.IsLegacyAssets} | MapToResources: {detail.MapToResources}"
                 );
+
+                // 3. Descargar assets
+                if (detail.IsLegacyAssets)
+                {
+                    await _assetManager.DownloadLegacyAssetsAsync(
+                        detail.AssetIndexUrl,
+                        detail.AssetIndex,
+                        detail.AssetIndexSha1,
+                        progress
+                    );
+
+                    progress.Report("Extrayendo sonidos del JAR...");
+                    _assetManager.ExtractSoundsFromJar(detail.Id);
+
+                    File.AppendAllText(
+                        Path.Combine(VersionDetail.MinecraftPath, "launcher_debug.log"),
+                        $"\n[DEBUG] ExtractSoundsFromJar ejecutado para {detail.Id} | IsLegacy: {detail.IsLegacyAssets}"
+                    );
+                }
+                else
+                {
+                    await _assetManager.DownloadAssetsAsync(
+                        detail.AssetIndexUrl,
+                        detail.AssetIndex,
+                        detail.AssetIndexSha1,
+                        progress
+                    );
+                }
+
+                if (detail.MapToResources)
+                {
+                    progress.Report("Mapeando assets a resources...");
+                    _assetManager.MapAssetsToResources(detail.AssetIndex);
+                }
 
                 // 4. Crear sesión offline
                 var session = AuthManager.CreateOfflineSession(username);

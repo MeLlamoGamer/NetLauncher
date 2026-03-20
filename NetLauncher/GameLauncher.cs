@@ -37,11 +37,13 @@ namespace NetLauncher
                 .Replace("${assets_root}", $"\"{assetsPath}\"")
                 .Replace("${game_assets}", $"\"{assetsPath}\"") // ← formato muy viejo
                 .Replace("${assets_index_name}", assetIndex)
+                .Replace("${asset_index}", assetIndex)
                 .Replace("${version_name}", detail.Id)
                 .Replace("${user_type}", "offline")
                 .Replace("${user_properties}", "{}");
 
                 jvmArgs = $"-Xmx2G -Djava.library.path=\"{nativesPath}\" -cp \"{classpath}\"";
+
             }
 
             string fullArgs = $"{jvmArgs} {detail.MainClass} {gameArgs}";

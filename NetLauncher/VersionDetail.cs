@@ -33,6 +33,8 @@ namespace NetLauncher
         public bool IsNewFormat { get; private set; } = false;
         public int JavaMajorVersion { get; private set; } = 8; // default para versiones viejas
         public List<LibraryInfo> Libraries { get; private set; } = new List<LibraryInfo>();
+        public bool IsLegacyAssets { get; private set; } = false;
+        public bool MapToResources { get; private set; } = false;
 
         public static string MinecraftPath => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -98,6 +100,28 @@ namespace NetLauncher
                 AssetIndex = assetIndexEl.GetProperty("id").GetString();
                 AssetIndexUrl = assetIndexEl.GetProperty("url").GetString();
                 AssetIndexSha1 = assetIndexEl.GetProperty("sha1").GetString();
+
+                // Detectar legacy por release time — versiones anteriores a 1.6 (junio 2013)
+                if (root.TryGetProperty("releaseTime", out JsonElement releaseTimeEl))
+                {
+                    string releaseTime = releaseTimeEl.GetString(); // "2012-03-29T22:00:00+00:00"
+                    if (DateTime.TryParse(releaseTime, out DateTime releaseDate))
+                    {
+                        // 1.6 salió en julio 2013 — todo lo anterior usa assets legacy
+                        IsLegacyAssets = releaseDate < new DateTime(2013, 11, 01);
+                    }
+                }
+                // 1.6.x — usa el nuevo sistema de assets pero además necesita copiarlos a /resources
+                if (root.TryGetProperty("assetIndex", out JsonElement assetIdxCheck))
+                {
+                    if (assetIdxCheck.TryGetProperty("map_to_resources", out JsonElement mapEl))
+                        MapToResources = mapEl.GetBoolean();
+                }
+
+                File.AppendAllText(
+                    Path.Combine(MinecraftPath, "version_debug.log"),
+                    $"\n[DEBUG] Id: {Id} | AssetIndex: {AssetIndex} | ReleaseTime: {(root.TryGetProperty("releaseTime", out JsonElement rt) ? rt.GetString() : "N/A")}"
+                );
 
                 string clientUrl = root.GetProperty("downloads").GetProperty("client").GetProperty("url").GetString();
                 string clientSha1 = root.GetProperty("downloads").GetProperty("client").GetProperty("sha1").GetString();
