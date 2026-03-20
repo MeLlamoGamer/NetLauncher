@@ -28,24 +28,26 @@ namespace NetLauncher
 
             string versionId = mcVersion.Items[e.Index].ToString();
 
-            // Verificar si la versión está cacheada localmente
             string versionJson = Path.Combine(VersionDetail.MinecraftPath, "versions", versionId, $"{versionId}.json");
             bool isCached = File.Exists(versionJson);
 
-            // Fondo — azul si está seleccionado, blanco si no
-            e.DrawBackground();
+            // Pintar fondo manualmente
+            Color backColor = (e.State & DrawItemState.Selected) != 0
+                ? SystemColors.Highlight
+                : SystemColors.Window;
 
-            // Fuente — negrita si está cacheada, normal si no
+            e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
+
+            // Color del texto
+            Color foreColor = (e.State & DrawItemState.Selected) != 0
+                ? SystemColors.HighlightText
+                : SystemColors.WindowText;
+
             Font font = isCached
                 ? new Font(e.Font, FontStyle.Bold)
                 : e.Font;
 
-            // Color del texto
-            Brush brush = (e.State & DrawItemState.Selected) != 0
-                ? SystemBrushes.HighlightText
-                : SystemBrushes.WindowText;
-
-            e.Graphics.DrawString(versionId, font, brush, e.Bounds);
+            e.Graphics.DrawString(versionId, font, new SolidBrush(foreColor), e.Bounds);
 
             if (isCached) font.Dispose();
 

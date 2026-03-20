@@ -193,7 +193,7 @@ namespace NetLauncher
                 string resolved = arg
                     .Replace("${natives_directory}", $"\"{nativesPath}\"")
                     .Replace("${launcher_name}", "NetLauncher")
-                    .Replace("${launcher_version}", "1.0")
+                    .Replace("${launcher_version}", "1.1")
                     .Replace("${classpath}", $"\"{classpath}\"");
 
                 result.Add(resolved);
