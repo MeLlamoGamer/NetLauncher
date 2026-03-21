@@ -198,6 +198,7 @@ namespace NetLauncher
                     _assetManager.MapAssetsToResources(detail.AssetIndex);
 
                 // 95% — lanzando
+                Application.DoEvents();
                 progressBar.Value = 95;
                 playButton.Text = "Lanzando...";
 
@@ -207,6 +208,7 @@ namespace NetLauncher
                 // 100% — jugando
                 progressBar.Value = 100;
                 playButton.Text = "¡Jugando!";
+                Application.DoEvents();
 
                 await Task.Run(() => gameProcess.WaitForExit());
 
