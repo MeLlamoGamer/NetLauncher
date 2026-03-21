@@ -51,7 +51,7 @@ namespace NetLauncher
             this.mcVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.mcVersion.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.mcVersion.FormattingEnabled = true;
-            this.mcVersion.Location = new System.Drawing.Point(12, 391);
+            this.mcVersion.Location = new System.Drawing.Point(15, 392);
             this.mcVersion.MinimumSize = new System.Drawing.Size(74, 0);
             this.mcVersion.Name = "mcVersion";
             this.mcVersion.Size = new System.Drawing.Size(87, 28);
@@ -138,7 +138,7 @@ namespace NetLauncher
             // settingsButton
             // 
             this.settingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.settingsButton.Location = new System.Drawing.Point(105, 393);
+            this.settingsButton.Location = new System.Drawing.Point(105, 394);
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(27, 26);
             this.settingsButton.TabIndex = 8;
