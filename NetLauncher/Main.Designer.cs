@@ -40,6 +40,7 @@ namespace NetLauncher
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.settingsButton = new System.Windows.Forms.Button();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -145,10 +146,18 @@ namespace NetLauncher
             this.settingsButton.UseVisualStyleBackColor = true;
             this.settingsButton.Click += new System.EventHandler(this.SettingsButton_Click);
             // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(27, 346);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(513, 15);
+            this.progressBar.TabIndex = 9;
+            // 
             // Main
             // 
             this.BackgroundImage = global::NetLauncher.Properties.Resources.bg;
             this.ClientSize = new System.Drawing.Size(566, 441);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.settingsButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -177,6 +186,7 @@ namespace NetLauncher
         private Label label1;
         private Label label2;
         private Button settingsButton;
+        private ProgressBar progressBar;
     }
 }
 

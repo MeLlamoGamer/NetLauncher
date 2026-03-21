@@ -162,15 +162,18 @@ namespace NetLauncher
             }
         }
 
-        public async Task<string> DownloadLibrariesAsync(IProgress<string> progress = null)
+        public async Task<string> DownloadLibrariesAsync(IProgress<int> progress = null)
         {
             var classpathParts = new List<string>();
+            int total = Libraries.Count;
+            int current = 0;
 
             foreach (var lib in Libraries)
             {
+                current++;
                 string destPath = Path.Combine(MinecraftPath, "libraries", lib.Path.Replace('/', Path.DirectorySeparatorChar));
 
-                progress?.Report($"Descargando: {Path.GetFileName(destPath)}");
+                progress?.Report((int)((float)current / total * 100));
                 await _downloader.DownloadFileAsync(lib.Url, destPath, lib.Sha1);
 
                 classpathParts.Add(destPath);
@@ -180,7 +183,7 @@ namespace NetLauncher
             return string.Join(";", classpathParts);
         }
 
-        public async Task ExtractNativesAsync(IProgress<string> progress = null)
+        public async Task ExtractNativesAsync(IProgress<int> progress = null)
         {
             string nativesPath = Path.Combine(MinecraftPath, "versions", Id, "natives");
             Directory.CreateDirectory(nativesPath);
@@ -212,10 +215,10 @@ namespace NetLauncher
 
                     string destJar = Path.Combine(MinecraftPath, "libraries", path.Replace('/', Path.DirectorySeparatorChar));
 
-                    progress?.Report($"Descargando native: {System.IO.Path.GetFileName(destJar)}");
+                    progress?.Report(50);
                     await _downloader.DownloadFileAsync(url, destJar, sha1);
 
-                    progress?.Report($"Extrayendo: {System.IO.Path.GetFileName(destJar)}");
+                    progress?.Report(60);
                     ExtractNativeJar(destJar, nativesPath);
                 }
             }

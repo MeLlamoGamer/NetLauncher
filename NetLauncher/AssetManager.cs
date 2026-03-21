@@ -81,12 +81,12 @@ namespace NetLauncher
         }
 
         // Versiones viejas (< 1.7) esperan los assets en /resources en lugar de /assets/objects
-        public async Task DownloadLegacyAssetsAsync(string assetIndexUrl, string assetIndexId, string assetIndexSha1, IProgress<string> progress = null)
+        public async Task DownloadLegacyAssetsAsync(string assetIndexUrl, string assetIndexId, string assetIndexSha1, IProgress<int> progress = null)
         {
             string indexDir = Path.Combine(VersionDetail.MinecraftPath, "assets", "indexes");
             string indexPath = Path.Combine(indexDir, $"{assetIndexId}.json");
 
-            progress?.Report("Descargando asset index (legacy)...");
+            progress?.Report(0);
             await _downloader.DownloadFileAsync(assetIndexUrl, indexPath, assetIndexSha1);
 
             string resourcesPath = Path.Combine(VersionDetail.MinecraftPath, "resources");
@@ -119,8 +119,8 @@ namespace NetLauncher
                     string objectDest = Path.Combine(VersionDetail.MinecraftPath, "assets", "objects", prefix, hash);
                     string url = $"https://resources.download.minecraft.net/{prefix}/{hash}";
 
-                    if (current % 50 == 0)
-                        progress?.Report($"Assets legacy: {current}/{total}");
+                    if (current % 10 == 0)
+                        progress?.Report((int)((float)current / total * 100));
 
                     await _downloader.DownloadFileAsync(url, objectDest, hash);
 
@@ -132,17 +132,18 @@ namespace NetLauncher
                         File.Copy(objectDest, resourceDest);
                 }
 
-                progress?.Report($"Assets legacy completos: {total}/{total}");
+                progress?.Report(100);
             }
         }
 
-        public async Task DownloadAssetsAsync(string assetIndexUrl, string assetIndexId, string assetIndexSha1, IProgress<string> progress = null)
+        public async Task DownloadAssetsAsync(string assetIndexUrl, string assetIndexId, string assetIndexSha1, IProgress<int> progress = null)
         {
+
             // 1. Descargar y guardar el asset index
             string indexDir = Path.Combine(VersionDetail.MinecraftPath, "assets", "indexes");
             string indexPath = Path.Combine(indexDir, $"{assetIndexId}.json");
 
-            progress?.Report("Descargando asset index...");
+            progress?.Report(0);
             await _downloader.DownloadFileAsync(assetIndexUrl, indexPath, assetIndexSha1);
 
             // 2. Parsear el index y descargar cada asset
@@ -172,13 +173,13 @@ namespace NetLauncher
 
                     string url = $"{RESOURCES_URL}{prefix}/{hash}";
 
-                    if (current % 50 == 0)
-                        progress?.Report($"Assets: {current}/{total}");
+                    if (current % 10 == 0)
+                        progress?.Report((int)((float)current / total * 100));
 
                     await _downloader.DownloadFileAsync(url, destPath, hash);
                 }
 
-                progress?.Report($"Assets completos: {total}/{total}");
+                progress?.Report(100);
             }
         }
     }

@@ -82,6 +82,7 @@ namespace NetLauncher
 
         private async void Main_Load(object sender, EventArgs e)
         {
+            progressBar.Visible = false;
             playButton.Enabled = false;
             mcVersion.Text = "Cargando...";
 
@@ -131,83 +132,80 @@ namespace NetLauncher
                 return;
             }
 
-            _settings.LastVersion = selectedId;
-            _settings.LastUsername = username;
-            _settings.Save();
-
             playButton.Enabled = false;
-            playButton.Text = "Descargando...";
-
-            IProgress<string> progress = new Progress<string>(msg => playButton.Text = msg);
+            playButton.Text = "Cargando...";
+            progressBar.Visible = true;
+            progressBar.Value = 0;
 
             try
             {
-                // 1. Obtener URL de la versión seleccionada
                 var mcVer = _versionManager.Versions.Find(v => v.Id == selectedId);
-
-                // 2. Cargar detalle y descargar client.jar + librerías
                 var detail = new VersionDetail();
+
+                // 5% — cargando JSON de versión
+                progressBar.Value = 5;
                 await detail.LoadAsync(mcVer.Url, mcVer.Id);
 
+                // Verificar Java
                 string javaError = _gameLauncher.CheckJava(detail.JavaMajorVersion);
                 if (javaError != null)
                 {
                     MessageBox.Show(javaError, "Java requerido",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    playButton.Text = "Play";
-                    playButton.Enabled = true;
+                    ResetUI();
                     return;
                 }
 
-                string classpath = await detail.DownloadLibrariesAsync(progress);
+                // 10% — descargando librerías
+                progressBar.Value = 10;
+                var libProgress = new Progress<int>(pct =>
+                {
+                    // Librerías van del 10% al 40%
+                    progressBar.Value = 10 + (int)(pct * 0.30);
+                });
+                string classpath = await detail.DownloadLibrariesAsync(libProgress);
 
-                await detail.ExtractNativesAsync(progress);
+                // 40% — extrayendo natives
+                progressBar.Value = 40;
+                var nativeProgress = new Progress<int>(pct =>
+                {
+                    // Natives van del 40% al 55%
+                    progressBar.Value = 40 + (int)(pct * 0.15);
+                });
+                await detail.ExtractNativesAsync(nativeProgress);
 
-                File.AppendAllText(
-                    Path.Combine(VersionDetail.MinecraftPath, "launcher_debug.log"),
-                    $"\n[DEBUG] AssetIndex: {detail.AssetIndex} | IsLegacy: {detail.IsLegacyAssets} | MapToResources: {detail.MapToResources}"
-                );
+                // 55% — descargando assets
+                progressBar.Value = 55;
+                var assetProgress = new Progress<int>(pct =>
+                {
+                    // Assets van del 55% al 95%
+                    progressBar.Value = 55 + (int)(pct * 0.40);
+                });
 
-                // 3. Descargar assets
                 if (detail.IsLegacyAssets)
                 {
                     await _assetManager.DownloadLegacyAssetsAsync(
-                        detail.AssetIndexUrl,
-                        detail.AssetIndex,
-                        detail.AssetIndexSha1,
-                        progress
-                    );
-
-                    progress.Report("Extrayendo sonidos del JAR...");
+                        detail.AssetIndexUrl, detail.AssetIndex, detail.AssetIndexSha1, assetProgress);
                     _assetManager.ExtractSoundsFromJar(detail.Id);
-
-                    File.AppendAllText(
-                        Path.Combine(VersionDetail.MinecraftPath, "launcher_debug.log"),
-                        $"\n[DEBUG] ExtractSoundsFromJar ejecutado para {detail.Id} | IsLegacy: {detail.IsLegacyAssets}"
-                    );
                 }
                 else
                 {
                     await _assetManager.DownloadAssetsAsync(
-                        detail.AssetIndexUrl,
-                        detail.AssetIndex,
-                        detail.AssetIndexSha1,
-                        progress
-                    );
+                        detail.AssetIndexUrl, detail.AssetIndex, detail.AssetIndexSha1, assetProgress);
                 }
 
                 if (detail.MapToResources)
-                {
-                    progress.Report("Mapeando assets a resources...");
                     _assetManager.MapAssetsToResources(detail.AssetIndex);
-                }
 
-                // 4. Crear sesión offline
-                var session = AuthManager.CreateOfflineSession(username);
-
-                // 5. Lanzar el juego
+                // 95% — lanzando
+                progressBar.Value = 95;
                 playButton.Text = "Lanzando...";
+
+                var session = AuthManager.CreateOfflineSession(username);
                 Process gameProcess = _gameLauncher.Launch(detail, classpath, session, detail.AssetIndex, _settings.MaxRamMb, _settings.ExtraJvmArgs);
+
+                // 100% — jugando
+                progressBar.Value = 100;
                 playButton.Text = "¡Jugando!";
 
                 await Task.Run(() => gameProcess.WaitForExit());
@@ -217,24 +215,27 @@ namespace NetLauncher
                 {
                     string logPath = Path.Combine(VersionDetail.MinecraftPath, "launcher_debug.log");
                     string logContent = File.Exists(logPath) ? File.ReadAllText(logPath) : "Sin log disponible";
-
                     MessageBox.Show($"El juego cerró con error (código {exitCode}).\n\nLog:\n{logContent}",
                                     "Error al lanzar", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                // El juego se cerró — resetear botón
-                playButton.Text = "Play";
-                playButton.Enabled = true;
-
-                
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al lanzar:\n{ex.Message}", "Error",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
-                playButton.Text = "Play";
-                playButton.Enabled = true;
             }
+            finally
+            {
+                ResetUI();
+            }
+        }
+
+        private void ResetUI()
+        {
+            playButton.Text = "Play";
+            playButton.Enabled = true;
+            progressBar.Visible = false;
+            progressBar.Value = 0;
         }
     }
 }
