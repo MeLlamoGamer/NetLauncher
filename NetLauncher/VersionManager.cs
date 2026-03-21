@@ -26,7 +26,7 @@ namespace NetLauncher
 
         public List<McVersion> Versions { get; private set; } = new List<McVersion>();
 
-        public async Task LoadVersionsAsync()
+        public async Task LoadVersionsAsync(bool includeSnapshots = false)
         {
             string json = null;
 
@@ -39,6 +39,8 @@ namespace NetLauncher
                 // Guardarlo en cache para uso offline
                 Directory.CreateDirectory(Path.GetDirectoryName(CachePath));
                 File.WriteAllText(CachePath, json);
+
+                ParseVersions(json, includeSnapshots);
             }
             catch
             {
@@ -49,10 +51,10 @@ namespace NetLauncher
                     throw new Exception("Sin conexión a internet y no hay versiones en caché.\nConectate al menos una vez para descargar la lista de versiones.");
             }
 
-            ParseVersions(json);
+            ParseVersions(json, includeSnapshots);
         }
 
-        private void ParseVersions(string json)
+        private void ParseVersions(string json, bool includeSnapshots)
         {
             Versions.Clear();
 
@@ -63,7 +65,11 @@ namespace NetLauncher
                 foreach (JsonElement v in versions.EnumerateArray())
                 {
                     string type = v.GetProperty("type").GetString();
-                    if (type != "release") continue;
+
+                    // Filtrar según configuración
+                    if (type == "release") { /* siempre incluir */ }
+                    else if (type == "snapshot" && includeSnapshots) { /* incluir si está activado */ }
+                    else continue;
 
                     Versions.Add(new McVersion
                     {

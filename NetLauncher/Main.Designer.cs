@@ -39,6 +39,7 @@ namespace NetLauncher
             this.changelog = new System.Windows.Forms.WebBrowser();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.settingsButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -49,10 +50,10 @@ namespace NetLauncher
             this.mcVersion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.mcVersion.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.mcVersion.FormattingEnabled = true;
-            this.mcVersion.Location = new System.Drawing.Point(12, 328);
+            this.mcVersion.Location = new System.Drawing.Point(12, 391);
             this.mcVersion.MinimumSize = new System.Drawing.Size(74, 0);
             this.mcVersion.Name = "mcVersion";
-            this.mcVersion.Size = new System.Drawing.Size(120, 28);
+            this.mcVersion.Size = new System.Drawing.Size(87, 28);
             this.mcVersion.TabIndex = 0;
             this.mcVersion.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.McVersion_DrawItem);
             // 
@@ -61,9 +62,9 @@ namespace NetLauncher
             this.playButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.playButton.Font = new System.Drawing.Font("Segoe Print", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playButton.Location = new System.Drawing.Point(138, 304);
+            this.playButton.Location = new System.Drawing.Point(138, 367);
             this.playButton.Name = "playButton";
-            this.playButton.Size = new System.Drawing.Size(104, 62);
+            this.playButton.Size = new System.Drawing.Size(290, 62);
             this.playButton.TabIndex = 1;
             this.playButton.Text = "Play";
             this.playButton.UseVisualStyleBackColor = true;
@@ -72,7 +73,7 @@ namespace NetLauncher
             // 
             this.playerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.playerName.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playerName.Location = new System.Drawing.Point(248, 329);
+            this.playerName.Location = new System.Drawing.Point(434, 392);
             this.playerName.Name = "playerName";
             this.playerName.Size = new System.Drawing.Size(120, 27);
             this.playerName.TabIndex = 3;
@@ -87,7 +88,7 @@ namespace NetLauncher
             this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
             this.pictureBox1.Location = new System.Drawing.Point(27, 24);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(327, 79);
+            this.pictureBox1.Size = new System.Drawing.Size(513, 79);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
@@ -102,7 +103,7 @@ namespace NetLauncher
             this.changelog.Location = new System.Drawing.Point(27, 119);
             this.changelog.MinimumSize = new System.Drawing.Size(20, 20);
             this.changelog.Name = "changelog";
-            this.changelog.Size = new System.Drawing.Size(327, 157);
+            this.changelog.Size = new System.Drawing.Size(513, 220);
             this.changelog.TabIndex = 5;
             this.changelog.Url = new System.Uri("https://raw.githubusercontent.com/MeLlamoGamer/NetLauncher/refs/heads/master/chan" +
         "gelog.txt", System.UriKind.Absolute);
@@ -114,7 +115,7 @@ namespace NetLauncher
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.Sienna;
-            this.label1.Location = new System.Drawing.Point(12, 312);
+            this.label1.Location = new System.Drawing.Point(12, 375);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(51, 14);
             this.label1.TabIndex = 6;
@@ -127,16 +128,28 @@ namespace NetLauncher
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.Color.Sienna;
-            this.label2.Location = new System.Drawing.Point(248, 312);
+            this.label2.Location = new System.Drawing.Point(434, 375);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(66, 14);
             this.label2.TabIndex = 7;
             this.label2.Text = "Username:";
             // 
+            // settingsButton
+            // 
+            this.settingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.settingsButton.Location = new System.Drawing.Point(105, 393);
+            this.settingsButton.Name = "settingsButton";
+            this.settingsButton.Size = new System.Drawing.Size(27, 26);
+            this.settingsButton.TabIndex = 8;
+            this.settingsButton.Text = "⚙️";
+            this.settingsButton.UseVisualStyleBackColor = true;
+            this.settingsButton.Click += new System.EventHandler(this.SettingsButton_Click);
+            // 
             // Main
             // 
             this.BackgroundImage = global::NetLauncher.Properties.Resources.bg;
-            this.ClientSize = new System.Drawing.Size(380, 378);
+            this.ClientSize = new System.Drawing.Size(566, 441);
+            this.Controls.Add(this.settingsButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.changelog);
@@ -147,6 +160,7 @@ namespace NetLauncher
             this.MinimumSize = new System.Drawing.Size(380, 378);
             this.Name = "Main";
             this.Text = "Net Launcher";
+            this.Load += new System.EventHandler(this.Main_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -162,6 +176,7 @@ namespace NetLauncher
         private System.Windows.Forms.WebBrowser changelog;
         private Label label1;
         private Label label2;
+        private Button settingsButton;
     }
 }
 

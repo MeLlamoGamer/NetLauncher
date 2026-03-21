@@ -22,6 +22,32 @@ namespace NetLauncher
             playButton.Click += PlayButton_Click;
         }
 
+        private async void SettingsButton_Click(object sender, EventArgs e)
+        {
+            bool previousSnapshots = _settings.ShowSnapshots;
+
+            using (var form = new SettingsForm(_settings))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // Si cambió la opción de snapshots, recargar la lista
+                    if (_settings.ShowSnapshots != previousSnapshots)
+                    {
+                        playButton.Enabled = false;
+                        await _versionManager.LoadVersionsAsync(_settings.ShowSnapshots);
+                        mcVersion.Items.Clear();
+
+                        foreach (var v in _versionManager.Versions)
+                            mcVersion.Items.Add(v.Id);
+
+                        if (mcVersion.Items.Count > 0)
+                            mcVersion.SelectedIndex = 0;
+
+                        playButton.Enabled = true;
+                    }
+                }
+            }
+        }
         private void McVersion_DrawItem(object sender, DrawItemEventArgs e)
         {
             if (e.Index < 0) return;
@@ -66,7 +92,7 @@ namespace NetLauncher
 
             try
             {
-                await _versionManager.LoadVersionsAsync();
+                await _versionManager.LoadVersionsAsync(_settings.ShowSnapshots);
                 mcVersion.Items.Clear();
 
                 foreach (var v in _versionManager.Versions)
@@ -122,6 +148,17 @@ namespace NetLauncher
                 // 2. Cargar detalle y descargar client.jar + librerías
                 var detail = new VersionDetail();
                 await detail.LoadAsync(mcVer.Url, mcVer.Id);
+
+                string javaError = _gameLauncher.CheckJava(detail.JavaMajorVersion);
+                if (javaError != null)
+                {
+                    MessageBox.Show(javaError, "Java requerido",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    playButton.Text = "Play";
+                    playButton.Enabled = true;
+                    return;
+                }
+
                 string classpath = await detail.DownloadLibrariesAsync(progress);
 
                 await detail.ExtractNativesAsync(progress);
@@ -170,7 +207,7 @@ namespace NetLauncher
 
                 // 5. Lanzar el juego
                 playButton.Text = "Lanzando...";
-                Process gameProcess = _gameLauncher.Launch(detail, classpath, session, detail.AssetIndex);
+                Process gameProcess = _gameLauncher.Launch(detail, classpath, session, detail.AssetIndex, _settings.MaxRamMb, _settings.ExtraJvmArgs);
                 playButton.Text = "¡Jugando!";
 
                 await Task.Run(() => gameProcess.WaitForExit());
