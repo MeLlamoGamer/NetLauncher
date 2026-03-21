@@ -1,3 +1,12 @@
+V1.2:
+- UI Improvements.
+- Added settings menu.
+- Now you can play on Snapshots.
+- Added Java Compatibility check.
+- Added Progress bar.
+Known bugs:
+- Same as last version.
+--------------------------------------------------------------------------------------------
 V1.1:
 - UI changes.
 - Version launching fixes.
