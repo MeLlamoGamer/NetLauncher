@@ -77,7 +77,7 @@ All game files are stored in:
 ## Known limitations
 
 - **No Microsoft/Mojang authentication** — offline mode only, cannot join online-mode servers
-- **No mod loader support** — Forge and Fabric are not supported yet
+- **Few mod loader support** — only fabric is supported yet
 - **Some 1.6.x versions may have missing sound** — work in progress
 - **Windows only** — WinForms does not support Linux or macOS
 
