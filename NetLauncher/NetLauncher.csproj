@@ -86,6 +86,7 @@
     <Compile Include="AssetManager.cs" />
     <Compile Include="AuthManager.cs" />
     <Compile Include="Downloader.cs" />
+    <Compile Include="FabricManager.cs" />
     <Compile Include="GameLauncher.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>

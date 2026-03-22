@@ -11,6 +11,7 @@ namespace NetLauncher
         public int MaxRamMb { get; set; } = 2048;  // ← nuevo
         public bool ShowSnapshots { get; set; } = false; // ← nuevo
         public string ExtraJvmArgs { get; set; } = "";
+        public bool ShowFabric { get; set; } = false;
 
         private static string SettingsPath => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -33,7 +34,8 @@ namespace NetLauncher
                             LastUsername = root.TryGetProperty("LastUsername", out JsonElement u) ? u.GetString() : null,
                             MaxRamMb = root.TryGetProperty("MaxRamMb", out JsonElement r) ? r.GetInt32() : 2048,
                             ShowSnapshots = root.TryGetProperty("ShowSnapshots", out JsonElement s) ? s.GetBoolean() : false,
-                            ExtraJvmArgs = root.TryGetProperty("ExtraJvmArgs", out JsonElement j) ? j.GetString() : ""
+                            ExtraJvmArgs = root.TryGetProperty("ExtraJvmArgs", out JsonElement j) ? j.GetString() : "",
+                            ShowFabric = root.TryGetProperty("ShowFabric", out JsonElement f) ? f.GetBoolean() : false  // ← agregar
                         };
                     }
                 }
@@ -55,7 +57,8 @@ namespace NetLauncher
                     LastUsername = LastUsername,
                     MaxRamMb = MaxRamMb,
                     ShowSnapshots = ShowSnapshots,
-                    ExtraJvmArgs = ExtraJvmArgs
+                    ExtraJvmArgs = ExtraJvmArgs,
+                    ShowFabric = ShowFabric    // ← agregar
                 });
 
                 File.WriteAllText(SettingsPath, json);

@@ -14,6 +14,7 @@ namespace NetLauncher
         private Label extraJvmLabel;
         private Button saveButton;
         private Button cancelButton;
+        private CheckBox fabricCheck;
 
         public SettingsForm(Settings settings)
         {
@@ -70,7 +71,14 @@ namespace NetLauncher
             snapshotsCheck = new CheckBox
             {
                 Text = "Mostrar snapshots en la lista de versiones",
-                Location = new System.Drawing.Point(12, 90),
+                Location = new System.Drawing.Point(12, 80),
+                AutoSize = true
+            };
+
+            fabricCheck = new CheckBox
+            {
+                Text = "Mostrar versiones de Fabric",
+                Location = new System.Drawing.Point(12, 110),
                 AutoSize = true
             };
 
@@ -78,13 +86,13 @@ namespace NetLauncher
             extraJvmLabel = new Label
             {
                 Text = "Argumentos JVM extra:",
-                Location = new System.Drawing.Point(12, 125),
+                Location = new System.Drawing.Point(12, 135),
                 AutoSize = true
             };
 
             extraJvmBox = new TextBox
             {
-                Location = new System.Drawing.Point(12, 145),
+                Location = new System.Drawing.Point(12, 155),
                 Size = new System.Drawing.Size(356, 20),
                 // PlaceholderText = "-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions"
             };
@@ -110,6 +118,7 @@ namespace NetLauncher
             {
                 ramTitleLabel, ramLabel, ramSlider,
                 snapshotsCheck,
+                fabricCheck,
                 extraJvmLabel, extraJvmBox,
                 saveButton, cancelButton
             });
@@ -122,6 +131,7 @@ namespace NetLauncher
             ramLabel.Text = mb >= 1024 ? $"{mb / 1024.0:0.#} GB ({mb} MB)" : $"{mb} MB";
             snapshotsCheck.Checked = _settings.ShowSnapshots;
             extraJvmBox.Text = _settings.ExtraJvmArgs;
+            fabricCheck.Checked = _settings.ShowFabric;
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
@@ -129,6 +139,7 @@ namespace NetLauncher
             _settings.MaxRamMb = ramSlider.Value * 512;
             _settings.ShowSnapshots = snapshotsCheck.Checked;
             _settings.ExtraJvmArgs = extraJvmBox.Text.Trim();
+            _settings.ShowFabric = fabricCheck.Checked;
             _settings.Save();
 
             this.DialogResult = DialogResult.OK;

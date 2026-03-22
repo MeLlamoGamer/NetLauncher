@@ -83,8 +83,13 @@ namespace NetLauncher
         // Versiones viejas (< 1.7) esperan los assets en /resources en lugar de /assets/objects
         public async Task DownloadLegacyAssetsAsync(string assetIndexUrl, string assetIndexId, string assetIndexSha1, IProgress<int> progress = null)
         {
+            string logPath = Path.Combine(VersionDetail.MinecraftPath, "launcher_debug.log");
+            File.AppendAllText(logPath, $"\n[DEBUG] DownloadLegacyAssetsAsync iniciado para index: {assetIndexId}");
+
             string indexDir = Path.Combine(VersionDetail.MinecraftPath, "assets", "indexes");
             string indexPath = Path.Combine(indexDir, $"{assetIndexId}.json");
+
+            File.AppendAllText(logPath, $"\n[DEBUG] Index path: {indexPath} | Existe: {File.Exists(indexPath)}");
 
             progress?.Report(0);
             await _downloader.DownloadFileAsync(assetIndexUrl, indexPath, assetIndexSha1);

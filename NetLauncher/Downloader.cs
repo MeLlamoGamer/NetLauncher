@@ -18,11 +18,24 @@ namespace NetLauncher
             Directory.CreateDirectory(Path.GetDirectoryName(destPath));
 
             // Si el archivo ya existe y el SHA1 es correcto, no lo volvemos a descargar
-            if (File.Exists(destPath) && expectedSha1 != null)
+            if (File.Exists(destPath))
             {
-                if (VerifySha1(destPath, expectedSha1))
-                    return true; // Ya está descargado y es válido
+                // Si hay SHA1, verificarlo
+                if (expectedSha1 != null)
+                {
+                    if (VerifySha1(destPath, expectedSha1))
+                        return true; // existe y es válido
+                                     // Si SHA1 no coincide, re-descargar
+                }
+                else
+                {
+                    return true; // existe y no hay SHA1 para verificar, asumir válido
+                }
             }
+
+            // Si no hay URL, no se puede descargar
+            if (string.IsNullOrEmpty(url))
+                return File.Exists(destPath);
 
             byte[] data = await _http.GetByteArrayAsync(url);
 

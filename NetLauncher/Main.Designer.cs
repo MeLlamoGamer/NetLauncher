@@ -54,7 +54,7 @@ namespace NetLauncher
             this.mcVersion.Location = new System.Drawing.Point(15, 392);
             this.mcVersion.MinimumSize = new System.Drawing.Size(74, 0);
             this.mcVersion.Name = "mcVersion";
-            this.mcVersion.Size = new System.Drawing.Size(87, 28);
+            this.mcVersion.Size = new System.Drawing.Size(117, 28);
             this.mcVersion.TabIndex = 0;
             this.mcVersion.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.McVersion_DrawItem);
             // 
@@ -63,9 +63,9 @@ namespace NetLauncher
             this.playButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.playButton.Font = new System.Drawing.Font("Segoe Print", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playButton.Location = new System.Drawing.Point(138, 367);
+            this.playButton.Location = new System.Drawing.Point(171, 367);
             this.playButton.Name = "playButton";
-            this.playButton.Size = new System.Drawing.Size(290, 62);
+            this.playButton.Size = new System.Drawing.Size(229, 62);
             this.playButton.TabIndex = 1;
             this.playButton.Text = "Play";
             this.playButton.UseVisualStyleBackColor = true;
@@ -74,9 +74,9 @@ namespace NetLauncher
             // 
             this.playerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.playerName.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playerName.Location = new System.Drawing.Point(434, 392);
+            this.playerName.Location = new System.Drawing.Point(406, 392);
             this.playerName.Name = "playerName";
-            this.playerName.Size = new System.Drawing.Size(120, 27);
+            this.playerName.Size = new System.Drawing.Size(148, 27);
             this.playerName.TabIndex = 3;
             this.playerName.Text = "Player";
             // 
@@ -129,7 +129,7 @@ namespace NetLauncher
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.Color.Sienna;
-            this.label2.Location = new System.Drawing.Point(434, 375);
+            this.label2.Location = new System.Drawing.Point(406, 375);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(66, 14);
             this.label2.TabIndex = 7;
@@ -138,7 +138,7 @@ namespace NetLauncher
             // settingsButton
             // 
             this.settingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.settingsButton.Location = new System.Drawing.Point(105, 394);
+            this.settingsButton.Location = new System.Drawing.Point(138, 394);
             this.settingsButton.Name = "settingsButton";
             this.settingsButton.Size = new System.Drawing.Size(27, 26);
             this.settingsButton.TabIndex = 8;
@@ -171,7 +171,6 @@ namespace NetLauncher
             this.MinimumSize = new System.Drawing.Size(380, 378);
             this.Name = "Main";
             this.Text = "Net Launcher";
-            this.Load += new System.EventHandler(this.Main_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

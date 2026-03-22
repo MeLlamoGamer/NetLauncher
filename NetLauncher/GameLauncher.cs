@@ -23,10 +23,33 @@ namespace NetLauncher
             if (detail.IsNewFormat)
             {
                 gameArgs = BuildNewGameArgs(detail.GameArguments, session, mcPath, assetsPath, assetIndex, detail.Id);
-                jvmArgs = BuildNewJvmArgs(detail.JvmArguments, nativesPath, classpath, mcPath, detail.Id, maxRamMb, extraJvmArgs);
+
+                if (detail.IsFabric)
+                {
+                    // Fabric no provee JVM args completos — construirlos manualmente
+                    jvmArgs = $"-Xmx{maxRamMb}M " +
+                              $"-Djava.library.path=\"{nativesPath}\" " +
+                              $"-Dfabric.gameVersion={detail.FabricMcVersion} " +
+                              $"-Dminecraft.api.auth.host=https://invalid.invalid " +
+                              $"-Dminecraft.api.account.host=https://invalid.invalid " +
+                              $"-Dminecraft.api.session.host=https://invalid.invalid " +
+                              $"-Dminecraft.api.services.host=https://invalid.invalid " +
+                              $"-cp \"{classpath}\"";
+
+                    if (!string.IsNullOrEmpty(extraJvmArgs))
+                        jvmArgs += " " + extraJvmArgs;
+                }
+                else
+                {
+                    jvmArgs = BuildNewJvmArgs(detail.JvmArguments, nativesPath, classpath, mcPath, detail.Id, maxRamMb, extraJvmArgs);
+                }
             }
             else
             {
+                string effectiveAssetsPath = detail.IsLegacyAssets
+                    ? Path.Combine(mcPath, "resources")
+                    : assetsPath;
+
                 gameArgs = detail.MinecraftArguments
                 .Replace("${auth_player_name}", session.Username)
                 .Replace("${auth_username}", session.Username)   // ← formato muy viejo
@@ -34,8 +57,8 @@ namespace NetLauncher
                 .Replace("${auth_access_token}", session.AccessToken)
                 .Replace("${auth_session}", session.AccessToken)
                 .Replace("${game_directory}", $"\"{mcPath}\"")
-                .Replace("${assets_root}", $"\"{assetsPath}\"")
-                .Replace("${game_assets}", $"\"{assetsPath}\"") // ← formato muy viejo
+                .Replace("${assets_root}", $"\"{effectiveAssetsPath}\"")
+                .Replace("${game_assets}", $"\"{effectiveAssetsPath}\"")
                 .Replace("${assets_index_name}", assetIndex)
                 .Replace("${asset_index}", assetIndex)
                 .Replace("${version_name}", detail.Id)
@@ -64,14 +87,25 @@ namespace NetLauncher
                 }
             };
 
-            process.OutputDataReceived += (s, e) => { if (e.Data != null) File.AppendAllText(logPath, "\n[OUT] " + e.Data); };
-            process.ErrorDataReceived += (s, e) => { if (e.Data != null) File.AppendAllText(logPath, "\n[ERR] " + e.Data); };
+            process.OutputDataReceived += (s, e) => { if (e.Data != null) AppendLog(logPath, "\n[OUT] " + e.Data); };
+            process.ErrorDataReceived += (s, e) => { if (e.Data != null) AppendLog(logPath, "\n[ERR] " + e.Data); };
 
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
             return process;
+        }
+
+        private static readonly object _logLock = new object();
+
+        private void AppendLog(string logPath, string text)
+        {
+            lock (_logLock)
+            {
+                try { File.AppendAllText(logPath, text); }
+                catch { }
+            }
         }
 
         private string FindJava(int requiredMajor)
@@ -185,8 +219,20 @@ namespace NetLauncher
 
         private string BuildNewGameArgs(List<string> args, OfflineSession session, string mcPath, string assetsPath, string assetIndex, string versionId)
         {
-            var result = new List<string>();
+            // Si no hay args definidos, usar los estándar
+            if (args == null || args.Count == 0)
+            {
+                return $"--username {session.Username} " +
+                       $"--version {versionId} " +
+                       $"--gameDir \"{mcPath}\" " +
+                       $"--assetsDir \"{assetsPath}\" " +
+                       $"--assetIndex {assetIndex} " +
+                       $"--uuid {session.UUID} " +
+                       $"--accessToken {session.AccessToken} " +
+                       $"--userType offline";
+            }
 
+            var result = new List<string>();
             foreach (string arg in args)
             {
                 string resolved = arg
@@ -212,32 +258,36 @@ namespace NetLauncher
 
         private string BuildNewJvmArgs(List<string> args, string nativesPath, string classpath, string mcPath, string versionId, int maxRamMb, string extraJvmArgs)
         {
-            if (args == null || args.Count == 0)
-                return $"-Xmx{maxRamMb}M {extraJvmArgs} -Djava.library.path=\"{nativesPath}\" -cp \"{classpath}\"".Trim();
+            const string offlineArgs = " -Dminecraft.api.auth.host=https://invalid.invalid" +
+                                       " -Dminecraft.api.account.host=https://invalid.invalid" +
+                                       " -Dminecraft.api.session.host=https://invalid.invalid" +
+                                       " -Dminecraft.api.services.host=https://invalid.invalid";
 
-            // Argumentos que requieren Java 21+ y pueden romper versiones anteriores
+            if (args == null || args.Count == 0)
+                return $"-Xmx{maxRamMb}M {extraJvmArgs} -Djava.library.path=\"{nativesPath}\" -cp \"{classpath}\"{offlineArgs}".Trim();
+
             var blacklist = new[]
             {
-        "--sun-misc-unsafe-memory-access=allow",
-        "--enable-native-access=ALL-UNNAMED"
-    };
+                "--sun-misc-unsafe-memory-access=allow",
+                "--enable-native-access=ALL-UNNAMED"
+            };
 
             var result = new List<string>();
-
             foreach (string arg in args)
             {
-                // Saltar argumentos de la blacklist si el Java no los soporta
                 bool isBlacklisted = false;
                 foreach (string b in blacklist)
                     if (arg.Contains(b)) { isBlacklisted = true; break; }
-
                 if (isBlacklisted) continue;
 
                 string resolved = arg
                     .Replace("${natives_directory}", $"\"{nativesPath}\"")
                     .Replace("${launcher_name}", "NetLauncher")
-                    .Replace("${launcher_version}", "1.0")
-                    .Replace("${classpath}", $"\"{classpath}\"");
+                    .Replace("${launcher_version}", "1.3")
+                    .Replace("${classpath}", $"\"{classpath}\"")
+                    .Replace("${version_name}", versionId)
+                    .Replace("${library_directory}", $"\"{Path.Combine(VersionDetail.MinecraftPath, "libraries")}\"")
+                    .Replace("${classpath_separator}", ";");
 
                 result.Add(resolved);
             }
@@ -246,6 +296,8 @@ namespace NetLauncher
 
             if (!joined.Contains("-Xmx"))
                 joined = $"-Xmx{maxRamMb}M " + joined;
+
+            joined += offlineArgs; // ← agregar acá
 
             if (!string.IsNullOrEmpty(extraJvmArgs))
                 joined = joined + " " + extraJvmArgs;
